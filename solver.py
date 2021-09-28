@@ -228,7 +228,35 @@ def uniformCostSearch(gameState):
     actions.push([0], 0)
     temp = []
     ### Implement uniform cost search here
-    
+    # While the frontier is not empty, we loop through it
+    while not frontier.isEmpty():
+        # Because we're using UCS, we use PrioryQueue
+        # with the priory is the cost, at each step
+        # we will pick the node with lowest cost from the queue
+        node = frontier.pop()
+        node_action = actions.pop()
+        # We found the solution, then return the step to go to the solution
+        if isEndState(node[-1][-1]):
+            temp = node_action[1:]
+            return temp
+        # Check if the node is not open yet
+        if node[-1] not in exploredSet:
+            # Current node will now be processed, maked it as opened
+            exploredSet.add(node[-1])
+            for action in legalActions(node[-1][0], node[-1][1]):
+                newPosPlayer, newPosBox = updateState(node[-1][0], node[-1][1], action)
+                # The next node is failed, we prune the search
+                if isFailed(newPosBox):
+                    continue
+                # Else, this can be a possible move to the goals
+                # Add unopened node to frontier for later explore
+                # with the cost as priory for later use
+                frontier.push(
+                    node + [(newPosPlayer, newPosBox)], cost(node_action[1:] + [action[-1]]))
+                # Record this step
+                actions.push(node_action + [action[-1]],
+                             cost(node_action[1:] + [action[-1]]))
+
     return temp
 
 """Read command"""
